@@ -1,0 +1,6 @@
+name = "draw2data-proxy"
+main = "src/index.ts"
+compatibility_date = "2025-01-01"
+
+[vars]
+AZURE_STORAGE_BASE = "https://overturemapswestus2.blob.core.windows.net/release"
