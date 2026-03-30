@@ -1,5 +1,6 @@
 import type { Feature } from '../../types';
-import initSqlJs, { type Database } from 'sql.js';
+// @ts-expect-error sql.js has no type declarations
+import initSqlJs from 'sql.js';
 
 // We need to encode geometry as GeoPackage binary (Standard GeoPackageBinary header + WKB)
 function featureToWkb(geom: { type: string; coordinates: unknown }): Uint8Array | null {
@@ -93,7 +94,8 @@ function featureToWkb(geom: { type: string; coordinates: unknown }): Uint8Array 
   return gpb;
 }
 
-let sqlJsPromise: Promise<{ Database: new () => Database }> | null = null;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+let sqlJsPromise: Promise<any> | null = null;
 
 function loadSqlJs() {
   if (!sqlJsPromise) {
@@ -106,6 +108,7 @@ function loadSqlJs() {
 
 export async function toGeoPackageBlob(features: Feature[]): Promise<Blob> {
   const SQL = await loadSqlJs();
+  if (!SQL) throw new Error('Failed to load sql.js');
   const db = new SQL.Database();
 
   // GeoPackage required tables

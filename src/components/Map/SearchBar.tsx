@@ -19,7 +19,7 @@ export function SearchBar({ onFlyTo, onBoundarySelect }: SearchBarProps) {
   const [results, setResults] = useState<SearchResult[]>([]);
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
-  const debounceRef = useRef<ReturnType<typeof setTimeout>>();
+  const debounceRef = useRef<ReturnType<typeof setTimeout>>(undefined);
 
   const search = useCallback(async (q: string) => {
     if (q.length < 2) { setResults([]); return; }
