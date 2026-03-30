@@ -2,7 +2,7 @@ import turfArea from '@turf/area';
 import { feature as turfFeature } from '@turf/helpers';
 import type { AOIGeometry } from '../types';
 
-const MAX_AOI_AREA_KM2 = 50;
+const MAX_AOI_AREA_KM2 = 200;
 
 export function calculateAreaKm2(geometry: AOIGeometry): number {
   const feat = turfFeature(geometry);

@@ -1,9 +1,11 @@
 import type { OutputFormat } from '../../types';
 
-const FORMATS: { id: OutputFormat; name: string; description: string }[] = [
-  { id: 'geojson', name: 'GeoJSON', description: '.geojson' },
-  { id: 'csv', name: 'CSV', description: '.csv with WKT geometry' },
-  { id: 'shapefile', name: 'Shapefile', description: '.zip (SHP + DBF + SHX)' },
+const FORMATS: { id: OutputFormat; name: string; desc: string }[] = [
+  { id: 'geojson', name: 'GeoJSON', desc: '.geojson' },
+  { id: 'csv', name: 'CSV', desc: '.csv' },
+  { id: 'shapefile', name: 'SHP', desc: '.zip' },
+  { id: 'kml', name: 'KML', desc: '.kml' },
+  { id: 'gpkg', name: 'GPKG', desc: '.gpkg' },
 ];
 
 interface FormatSelectorProps {
@@ -13,27 +15,20 @@ interface FormatSelectorProps {
 
 export function FormatSelector({ selected, onChange }: FormatSelectorProps) {
   return (
-    <div className="space-y-2">
-      {FORMATS.map((format) => (
-        <label
-          key={format.id}
-          className="flex items-center gap-2 cursor-pointer group"
+    <div className="flex flex-wrap gap-1.5">
+      {FORMATS.map((f) => (
+        <button
+          key={f.id}
+          onClick={() => onChange(f.id)}
+          className={`px-3 py-2 rounded-xl text-xs font-medium transition-all duration-200 ${
+            selected === f.id
+              ? 'bg-indigo-500 text-white shadow-md shadow-indigo-500/20'
+              : 'bg-white/60 text-gray-500 hover:bg-white/80 border border-gray-200/40'
+          }`}
+          title={f.desc}
         >
-          <input
-            type="radio"
-            name="format"
-            value={format.id}
-            checked={selected === format.id}
-            onChange={() => onChange(format.id)}
-            className="border-gray-300 text-blue-600 focus:ring-blue-500"
-          />
-          <div>
-            <span className="text-sm text-gray-800 group-hover:text-blue-600">
-              {format.name}
-            </span>
-            <span className="text-xs text-gray-400 ml-1">{format.description}</span>
-          </div>
-        </label>
+          {f.name}
+        </button>
       ))}
     </div>
   );

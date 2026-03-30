@@ -21,12 +21,27 @@ export interface DatasetConfig {
   geometryType: GeometryType;
 }
 
-export type OutputFormat = 'geojson' | 'csv' | 'shapefile';
+export type OutputFormat = 'geojson' | 'csv' | 'shapefile' | 'kml' | 'gpkg';
 
 export interface ExtractionRequest {
   aoi: AOIGeometry;
   datasets: string[];
   format: OutputFormat;
+}
+
+export type DataSource = 'overture' | 'osm' | 'google' | 'microsoft' | 'none';
+
+export interface SourceResult {
+  source: DataSource;
+  featureCount: number;
+  durationMs: number;
+  error?: string;
+}
+
+export interface DatasetSourceComparison {
+  dataset: string;
+  winner: DataSource;
+  sources: SourceResult[];
 }
 
 export interface ExtractionResult {
@@ -35,6 +50,7 @@ export interface ExtractionResult {
     featureCount: number;
     datasetsQueried: string[];
     durationMs: number;
+    sourceComparisons?: DatasetSourceComparison[];
   };
 }
 

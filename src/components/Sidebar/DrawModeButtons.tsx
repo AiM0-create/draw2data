@@ -5,37 +5,33 @@ interface DrawModeButtonsProps {
 
 export function DrawModeButtons({ activeMode, onModeChange }: DrawModeButtonsProps) {
   const handleClick = (mode: 'polygon' | 'rectangle') => {
-    if (activeMode === mode) {
-      onModeChange(null);
-    } else {
-      onModeChange(mode);
-    }
+    onModeChange(activeMode === mode ? null : mode);
   };
 
   return (
-    <div className="flex gap-2 mb-2">
+    <div className="flex gap-2">
       <button
         onClick={() => handleClick('rectangle')}
-        className={`flex-1 text-xs py-1.5 px-3 rounded border transition-colors ${
+        className={`flex-1 text-xs py-2.5 px-3 rounded-xl font-medium transition-all duration-200 ${
           activeMode === 'rectangle'
-            ? 'bg-blue-50 border-blue-400 text-blue-700'
-            : 'border-gray-300 text-gray-600 hover:border-blue-400 hover:text-blue-600'
+            ? 'bg-indigo-500 text-white shadow-lg shadow-indigo-500/25 scale-[1.02]'
+            : 'bg-white/60 text-gray-600 hover:bg-white/80 border border-gray-200/50'
         }`}
       >
-        <svg className="inline w-3.5 h-3.5 mr-1 -mt-0.5" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
-          <rect x="2" y="3" width="12" height="10" rx="0.5" />
+        <svg className="inline w-3.5 h-3.5 mr-1.5 -mt-0.5" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+          <rect x="2" y="3" width="12" height="10" rx="1.5" />
         </svg>
         Rectangle
       </button>
       <button
         onClick={() => handleClick('polygon')}
-        className={`flex-1 text-xs py-1.5 px-3 rounded border transition-colors ${
+        className={`flex-1 text-xs py-2.5 px-3 rounded-xl font-medium transition-all duration-200 ${
           activeMode === 'polygon'
-            ? 'bg-blue-50 border-blue-400 text-blue-700'
-            : 'border-gray-300 text-gray-600 hover:border-blue-400 hover:text-blue-600'
+            ? 'bg-indigo-500 text-white shadow-lg shadow-indigo-500/25 scale-[1.02]'
+            : 'bg-white/60 text-gray-600 hover:bg-white/80 border border-gray-200/50'
         }`}
       >
-        <svg className="inline w-3.5 h-3.5 mr-1 -mt-0.5" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+        <svg className="inline w-3.5 h-3.5 mr-1.5 -mt-0.5" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
           <polygon points="8,1 14,6 12,14 4,14 2,6" />
         </svg>
         Polygon

@@ -69,7 +69,7 @@ export function DrawControl({ map, onAOIChange, onAOIClear, activeMode, onModeCh
             midPointOutlineWidth: 1,
           },
         }),
-        new TerraDrawRenderMode({ modeName: 'static' }),
+        new TerraDrawRenderMode({ modeName: 'static', styles: {} }),
       ],
     });
 
@@ -77,10 +77,10 @@ export function DrawControl({ map, onAOIChange, onAOIClear, activeMode, onModeCh
     drawRef.current = draw;
 
     // Listen for feature completion
-    draw.on('finish', (id: string) => {
+    draw.on('finish', (id: string | number) => {
       const snapshot = draw.getSnapshot();
       const feature = snapshot.find((f) => f.id === id);
-      if (feature && (feature.geometry.type === 'Polygon' || feature.geometry.type === 'MultiPolygon')) {
+      if (feature && (feature.geometry.type === 'Polygon' || (feature.geometry.type as string) === 'MultiPolygon')) {
         // Remove any previously drawn features (keep only the latest)
         const otherIds = snapshot.filter((f) => f.id !== id && f.properties.mode !== 'static').map((f) => f.id);
         if (otherIds.length > 0) {
@@ -100,7 +100,7 @@ export function DrawControl({ map, onAOIChange, onAOIClear, activeMode, onModeCh
         onAOIClear();
       } else {
         const latest = drawnFeatures[drawnFeatures.length - 1];
-        if (latest.geometry.type === 'Polygon' || latest.geometry.type === 'MultiPolygon') {
+        if (latest.geometry.type === 'Polygon' || (latest.geometry.type as string) === 'MultiPolygon') {
           onAOIChange(latest.geometry as AOIGeometry);
         }
       }
