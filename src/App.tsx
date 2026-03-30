@@ -9,10 +9,14 @@ import { useAuth } from './hooks/useAuth';
 import { logExtraction } from './lib/analytics';
 import type { AOIGeometry, OutputFormat, Feature } from './types';
 
-function App() {
+/** Authenticated main app — unmounts cleanly when user signs out. */
+function MainApp({ user, isAdmin, onLogout }: {
+  user: { email: string; displayName: string; photoURL: string | null };
+  isAdmin: boolean;
+  onLogout: () => void;
+}) {
   const { aoiState, setAOI, clearAOI } = useAOI();
   const { extractionState, runExtraction, downloadResult, resetExtraction } = useExtraction();
-  const { user, isAdmin, login, logout } = useAuth();
   const [selectedDatasets, setSelectedDatasets] = useState<string[]>(['buildings']);
   const [selectedFormat, setSelectedFormat] = useState<OutputFormat>('geojson');
   const [activeDrawMode, setActiveDrawMode] = useState<'polygon' | 'rectangle' | null>(null);
@@ -43,7 +47,7 @@ function App() {
 
   useEffect(() => {
     if (extractionState.status === 'done' && extractionState.result && extractionState.result.features.length > 0) {
-      logExtraction(user?.email ?? null, extractionState.result.metadata.datasetsQueried, extractionState.result, aoiState.areaKm2);
+      logExtraction(user.email, extractionState.result.metadata.datasetsQueried, extractionState.result, aoiState.areaKm2);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [extractionState.status]);
@@ -53,11 +57,6 @@ function App() {
   }, [downloadResult, selectedFormat, selectedColumns]);
 
   const handleGeoJSONUpload = useCallback((geometry: AOIGeometry) => { setAOI(geometry); }, [setAOI]);
-
-  // Gate behind login
-  if (!user) {
-    return <LandingPage onLogin={login} />;
-  }
 
   const allFeatures = extractionState.result?.features ?? null;
   const previewFeatures = filteredFeatures ?? allFeatures;
@@ -89,7 +88,7 @@ function App() {
         onDrawModeChange={setActiveDrawMode}
         user={user}
         isAdmin={isAdmin}
-        onLogout={logout}
+        onLogout={onLogout}
         onAdminClick={() => setShowAdmin(true)}
         filteredFeatures={filteredFeatures}
         onFilter={setFilteredFeatures}
@@ -102,6 +101,17 @@ function App() {
       )}
     </div>
   );
+}
+
+function App() {
+  const { user, isAdmin, login, logout } = useAuth();
+
+  if (!user) {
+    return <LandingPage onLogin={login} />;
+  }
+
+  // Key on user email forces full remount on sign-out/sign-in
+  return <MainApp key={user.email} user={user} isAdmin={isAdmin} onLogout={logout} />;
 }
 
 export default App;

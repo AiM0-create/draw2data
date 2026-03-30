@@ -107,7 +107,7 @@ export function DrawControl({ map, onAOIChange, onAOIClear, activeMode, onModeCh
     });
 
     return () => {
-      draw.stop();
+      try { draw.stop(); } catch { /* map may already be destroyed */ }
       drawRef.current = null;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps

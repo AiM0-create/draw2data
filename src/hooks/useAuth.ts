@@ -9,8 +9,8 @@ export interface AuthState {
 export function useAuth() {
   const [user, setUser] = useState<SimpleUser | null>(() => getSavedUser());
 
-  const login = useCallback((email: string, name: string) => {
-    const u: SimpleUser = { email, displayName: name || email.split('@')[0], photoURL: null };
+  const login = useCallback((email: string, name: string, photoURL?: string) => {
+    const u: SimpleUser = { email, displayName: name || email.split('@')[0], photoURL: photoURL ?? null };
     saveUser(u);
     setUser(u);
   }, []);
