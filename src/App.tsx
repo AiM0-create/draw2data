@@ -66,6 +66,7 @@ function App() {
     <div className="flex h-full bg-gray-50">
       <div className="flex-1 relative">
         <MapView
+          aoiGeometry={aoiState.geometry}
           onAOIChange={setAOI}
           onAOIClear={clearAOI}
           activeDrawMode={activeDrawMode}

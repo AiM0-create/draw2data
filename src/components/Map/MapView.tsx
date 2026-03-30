@@ -4,6 +4,7 @@ import type { Map as MaplibreMap } from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import { DrawControl } from './DrawControl';
 import { useResultsLayer } from './ResultsLayer';
+import { useAOILayer } from './AOILayer';
 import { FeatureCountOverlay } from './FeatureCountOverlay';
 import { SearchBar } from './SearchBar';
 import { BasemapToggle, getBasemapStyle, type BasemapId } from './BasemapToggle';
@@ -16,6 +17,7 @@ const INITIAL_VIEW = {
 };
 
 interface MapViewProps {
+  aoiGeometry: AOIGeometry | null;
   onAOIChange: (geometry: AOIGeometry | null) => void;
   onAOIClear: () => void;
   activeDrawMode: 'polygon' | 'rectangle' | null;
@@ -23,7 +25,7 @@ interface MapViewProps {
   previewFeatures: Feature[] | null;
 }
 
-export function MapView({ onAOIChange, onAOIClear, activeDrawMode, onDrawModeChange, previewFeatures }: MapViewProps) {
+export function MapView({ aoiGeometry, onAOIChange, onAOIClear, activeDrawMode, onDrawModeChange, previewFeatures }: MapViewProps) {
   const [mapInstance, setMapInstance] = useState<MaplibreMap | null>(null);
   const [basemap, setBasemap] = useState<BasemapId>('light');
   const mapRef = useRef<MaplibreMap | null>(null);
@@ -45,6 +47,9 @@ export function MapView({ onAOIChange, onAOIClear, activeDrawMode, onDrawModeCha
   const handleBoundarySelect = useCallback((geometry: AOIGeometry) => {
     onAOIChange(geometry);
   }, [onAOIChange]);
+
+  // Render AOI boundary on map
+  useAOILayer(mapInstance, aoiGeometry);
 
   // Render extraction results on map
   useResultsLayer(mapInstance, previewFeatures);
