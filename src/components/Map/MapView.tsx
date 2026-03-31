@@ -1,10 +1,9 @@
-import { useState, useCallback, useRef } from 'react';
-import Map, { NavigationControl } from 'react-map-gl/maplibre';
+import { useState, useCallback, useRef, useMemo } from 'react';
+import Map, { NavigationControl, Source, Layer } from 'react-map-gl/maplibre';
 import type { Map as MaplibreMap } from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import { DrawControl } from './DrawControl';
 import { useResultsLayer } from './ResultsLayer';
-import { useAOILayer } from './AOILayer';
 import { FeatureCountOverlay } from './FeatureCountOverlay';
 import { SearchBar } from './SearchBar';
 import { BasemapToggle, getBasemapStyle, type BasemapId } from './BasemapToggle';
@@ -14,6 +13,17 @@ const INITIAL_VIEW = {
   longitude: 0,
   latitude: 20,
   zoom: 2,
+};
+
+const AOI_FILL_PAINT = {
+  'fill-color': '#6366f1',
+  'fill-opacity': 0.15,
+};
+
+const AOI_LINE_PAINT = {
+  'line-color': '#6366f1',
+  'line-width': 2.5,
+  'line-dasharray': [3, 2] as [number, number],
 };
 
 interface MapViewProps {
@@ -41,17 +51,19 @@ export function MapView({ aoiGeometry, onAOIChange, onAOIClear, activeDrawMode, 
 
   const handleBasemapChange = useCallback((id: BasemapId) => {
     setBasemap(id);
-    // Style change will re-trigger via Map prop
   }, []);
 
   const handleBoundarySelect = useCallback((geometry: AOIGeometry) => {
     onAOIChange(geometry);
   }, [onAOIChange]);
 
-  // Render AOI boundary on map
-  useAOILayer(mapInstance, aoiGeometry);
+  // GeoJSON data for the AOI layer — memoized to avoid re-creating on every render
+  const aoiData = useMemo(() => {
+    if (!aoiGeometry) return { type: 'FeatureCollection' as const, features: [] as never[] };
+    return { type: 'Feature' as const, properties: {}, geometry: aoiGeometry };
+  }, [aoiGeometry]);
 
-  // Render extraction results on map
+  // Render extraction results on map (imperative — results use multiple dynamic layers)
   useResultsLayer(mapInstance, previewFeatures);
 
   return (
@@ -70,6 +82,12 @@ export function MapView({ aoiGeometry, onAOIChange, onAOIClear, activeDrawMode, 
           activeMode={activeDrawMode}
           onModeChange={onDrawModeChange}
         />
+
+        {/* AOI boundary — declarative Source/Layer handles all lifecycle timing */}
+        <Source id="aoi-source" type="geojson" data={aoiData}>
+          <Layer id="aoi-fill" type="fill" paint={AOI_FILL_PAINT} />
+          <Layer id="aoi-outline" type="line" paint={AOI_LINE_PAINT} />
+        </Source>
       </Map>
       <SearchBar onFlyTo={handleFlyTo} onBoundarySelect={handleBoundarySelect} />
       <FeatureCountOverlay features={previewFeatures} />
